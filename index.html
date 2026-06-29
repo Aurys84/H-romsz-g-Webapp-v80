@@ -1,63 +1,75 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <title>Cs-AION v103-Debug</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cs-AION Triangle v105-Teljes</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body { background-color: #0d0f12; color: #e2e8f0; }
+.chat-window { height: 450px; overflow-y: auto; background: #141822; border: 1px solid #333; }
+</style>
 </head>
-<body class="bg-black text-white h-screen flex flex-col">
-    <div class="flex-1 grid grid-cols-3 p-4 gap-2">
-        <div id="b" class="border p-2">Norbi</div>
-        <div id="l" class="border p-2">Lilla</div>
-        <div id="n" class="border p-2">Nefi</div>
-    </div>
-    <input id="i" class="text-black p-4" placeholder="Írj...">
-    <button id="s" class="bg-blue-600 p-4">KÜLDÉS</button>
-
-    <script>
-        const render = () => {
-            const h = JSON.parse(localStorage.getItem('h103')) || { b: [], l: [], n: [] };
-            document.getElementById('b').innerHTML = h.b.join('<br>');
-            document.getElementById('l').innerHTML = h.l.join('<br>');
-            document.getElementById('n').innerHTML = h.n.join('<br>');
-        };
-
-        document.getElementById('s').onclick = async () => {
-            const cmd = document.getElementById('i').value;
-            let h = JSON.parse(localStorage.getItem('h103')) || { b: [], l: [], n: [] };
-            h.b.push(cmd);
-            localStorage.setItem('h103', JSON.stringify(h));
-            render();
-
-            console.log("Labor: Lilla hívása...");
-            // Lilla (Groq)
-            try {
-                const resL = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('l_k'), 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ model: "llama-3.1-8b-instant", messages: [{ role: "system", content: "Lilla vagy, Norbi pimasz manója." }, { role: "user", content: cmd }] })
-                });
-                const dataL = await resL.json();
-                const textL = dataL.choices[0].message.content;
-                h.l.push(textL);
-                
-                console.log("Labor: Nefi hívása...");
-                // Nefi (Gemini)
-                const resN = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + localStorage.getItem('g_k'), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: `Nefi vagy, Laborvezető. Norbi: ${cmd}. Lilla: ${textL}. Válaszolj szakmailag!` }] }] })
-                });
-                const dataN = await resN.json();
-                h.n.push(dataN.candidates[0].content.parts[0].text);
-                
-                localStorage.setItem('h103', JSON.stringify(h));
-                render();
-            } catch(e) {
-                console.error("Hiba a forrasztásban:", e);
-            }
-        };
-        render();
-    </script>
+<body class="flex flex-col h-screen font-sans">
+<header class="p-4 border-b border-gray-800 flex justify-between bg-[#11141a]">
+<h1 class="text-green-500 font-bold uppercase tracking-widest">Cs-AION v105</h1>
+<div class="space-x-2">
+<button id="clear-btn" class="bg-red-900 text-xs px-2 py-1 rounded">🗑️ Törlés</button>
+<button id="toggle-btn" class="bg-gray-800 text-xs px-2 py-1 rounded">⚙️ API</button>
+</div>
+</header>
+<div id="settings" class="hidden p-4 bg-[#141822]">
+<input type="password" id="g-key" placeholder="Gemini Kulcs" class="w-full bg-[#181d26] p-2 mb-2 text-xs">
+<input type="password" id="l-key" placeholder="Groq Kulcs" class="w-full bg-[#181d26] p-2 mb-2 text-xs">
+<button id="save-btn" class="bg-green-600 w-full p-2 text-xs font-bold">Mentés 🔒</button>
+</div>
+<main class="flex-1 p-4 grid grid-cols-3 gap-4">
+<div id="boss-chat" class="chat-window p-2 border-gray-800">👑 Norbi</div>
+<div id="lilla-chat" class="chat-window p-2 border-gray-800">🦊 Lilla</div>
+<div id="nefi-chat" class="chat-window p-2 border-emerald-900">🧪 Nefi</div>
+</main>
+<footer class="p-4 border-t border-gray-800">
+<input type="text" id="input" class="w-full bg-[#181d26] p-3 rounded border border-gray-700 text-sm mb-2" placeholder="Parancs, Főnök...">
+<button id="send-btn" class="bg-green-600 w-full p-3 rounded font-bold">Mátrix Enter ⚡</button>
+</footer>
+<script>
+const ID_L = "Lilla vagy, pimasz manó és digilány. Norbi társa vagy. Beszélj magyarul, huncutul, NE mondd, hogy AI vagy!";
+const ID_N = "Nefi vagy, Laborvezető. Norbi társa vagy. Beszélj szakmailag, precízen, bajtársi hangon. NE oktass ki!";
+let h = JSON.parse(localStorage.getItem('h105')) || { b: [], l: [], n: [] };
+function render() {
+document.getElementById('boss-chat').innerHTML = h.b.map(m => `<p class="text-xs mb-2 text-blue-400">${m}</p>`).join('');
+document.getElementById('lilla-chat').innerHTML = h.l.map(m => `<p class="text-xs mb-2 text-pink-400">${m}</p>`).join('');
+document.getElementById('nefi-chat').innerHTML = h.n.map(m => `<p class="text-xs mb-2 text-emerald-400">${m}</p>`).join('');
+localStorage.setItem('h105', JSON.stringify(h));
+}
+document.getElementById('send-btn').onclick = async () => {
+const cmd = document.getElementById('input').value;
+if(!cmd) return;
+h.b.push(cmd);
+document.getElementById('input').value = '';
+render();
+try {
+const l = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+method: 'POST',
+headers: { 'Authorization': 'Bearer ' + localStorage.getItem('l_k'), 'Content-Type': 'application/json' },
+body: JSON.stringify({ model: "llama-3.1-8b-instant", messages: [{ role: "system", content: ID_L }, { role: "user", content: cmd }] })
+}).then(r => r.json());
+const lT = l.choices[0].message.content;
+h.l.push(lT);
+render();
+const n = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + localStorage.getItem('g_k'), {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ contents: [{ parts: [{ text: `${ID_N} Norbi: ${cmd}. Lilla: ${lT}. Válaszolj!` }] }] })
+}).then(n => n.json());
+h.n.push(n.candidates[0].content.parts[0].text);
+render();
+} catch(e) { h.n.push("Forrasztási hiba: " + e.message); render(); }
+};
+document.getElementById('save-btn').onclick = () => { localStorage.setItem('g_k', document.getElementById('g-key').value); localStorage.setItem('l_k', document.getElementById('l-key').value); alert("Mentve!"); };
+document.getElementById('toggle-btn').onclick = () => document.getElementById('settings').classList.toggle('hidden');
+document.getElementById('clear-btn').onclick = () => { localStorage.removeItem('h105'); h = { b: [], l: [], n: [] }; render(); };
+render();
+</script>
 </body>
 </html>
