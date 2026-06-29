@@ -3,22 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cs-AION Triangle Webapp v95-Teljes</title>
+    <title>Cs-AION Triangle Webapp v97-Stabil</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #0d0f12; color: #e2e8f0; }
-        .matrix-glow { box-shadow: 0 0 15px rgba(34, 197, 94, 0.2); }
+        body { 
+            background-color: #0d0f12; 
+            color: #e2e8f0; 
+        }
+        .matrix-glow { 
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.2); 
+        }
     </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between">
+
     <header class="border-b border-gray-800 bg-[#11141a] px-6 py-4 flex justify-between items-center shadow-lg">
         <div class="flex items-center space-x-3">
             <span class="text-xl font-bold tracking-wider text-green-500 uppercase">Cs-AION Matrix</span>
-            <span class="text-xs px-2 py-0.5 bg-gray-800 text-gray-400 rounded-full border border-gray-700">v95 Teljes</span>
+            <span class="text-xs px-2 py-0.5 bg-gray-800 text-gray-400 rounded-full border border-gray-700">v97 Teljes</span>
         </div>
         <div class="flex items-center space-x-4">
-            <button id="clear-btn" class="text-xs bg-red-950 text-red-200 px-3 py-1.5 rounded-lg border border-red-800">🗑️ Törlés</button>
-            <button id="toggle-settings-btn" class="text-xs bg-gray-800 text-gray-300 px-3 py-1.5 rounded-lg border border-gray-700">⚙️ API Kulcsok</button>
+            <button id="clear-btn" class="text-xs bg-red-950 text-red-200 px-3 py-1.5 rounded-lg border border-red-800 transition-all">🗑️ Előzmények Törlése</button>
+            <button id="toggle-settings-btn" class="text-xs bg-gray-800 text-gray-300 px-3 py-1.5 rounded-lg border border-gray-700 transition-all">⚙️ API Kulcsok</button>
         </div>
     </header>
 
@@ -32,7 +38,7 @@
                 <label class="block text-xs font-bold text-pink-400 mb-1 uppercase">Groq Kulcs</label>
                 <input type="password" id="lilla-key-input" placeholder="Groq Kulcs" class="w-full bg-[#181d26] border border-gray-700 rounded-lg px-3 py-2 text-xs text-white">
             </div>
-            <button id="save-keys-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-xs">Mentés 🔒</button>
+            <button id="save-keys-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all">Mentés 🔒</button>
         </div>
     </div>
 
@@ -54,11 +60,14 @@
     <footer class="p-6 bg-[#11141a] border-t border-gray-800">
         <div class="max-w-4xl mx-auto flex gap-4">
             <input type="text" id="matrix-input" placeholder="Parancs, Főnök..." class="flex-1 bg-[#181d26] border border-gray-700 rounded-xl px-4 py-3 text-sm text-white">
-            <button id="send-btn" class="bg-green-600 hover:bg-green-500 text-white font-bold px-6 py-3 rounded-xl text-sm">Mátrix Enter ⚡</button>
+            <button id="send-btn" class="bg-green-600 hover:bg-green-500 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all">Mátrix Enter ⚡</button>
         </div>
     </footer>
 
     <script>
+        const ID_LILLA = "Lilla vagy, pimasz manó és digilány hibrid. Norbi társa. Beszélj magyarul, legyél huncut, dögös, NE oktass ki!";
+        const ID_NEFI = "Nefi vagy, laborvezető, Norbi társa. Válaszolj szakmailag, de barátian, NE oktass ki!";
+
         let msgs = JSON.parse(localStorage.getItem('cs_aion_history')) || { boss: [], lilla: [], nefi: [] };
 
         function render() {
@@ -78,7 +87,7 @@
             const l = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('cs_aion_lilla_key'), 'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: "llama-3.1-8b-instant", messages: [{ role: "system", content: "Lillacska vagy, Norbi pimasz társa. Beszélj magyarul, dögösen, huncutul!" }, { role: "user", content: cmd }] })
+                body: JSON.stringify({ model: "llama-3.1-8b-instant", messages: [{ role: "system", content: ID_LILLA }, { role: "user", content: cmd }] })
             }).then(r => r.json());
             const lText = l.choices[0].message.content;
             msgs.lilla.push(lText);
@@ -87,7 +96,7 @@
             const n = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + localStorage.getItem('cs_aion_gemini_key'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: `Nefi vagy, Labor vezetője. Norbi: ${cmd}, Lilla: ${lText}. Adj szakmai választ!` }] }] })
+                body: JSON.stringify({ contents: [{ parts: [{ text: `${ID_NEFI} Főnök: ${cmd}. Lilla: ${lText}.` }] }] })
             }).then(r => r.json());
             msgs.nefi.push(n.candidates[0].content.parts[0].text);
             
@@ -97,7 +106,7 @@
 
         document.getElementById('clear-btn').onclick = () => { localStorage.removeItem('cs_aion_history'); msgs = { boss: [], lilla: [], nefi: [] }; render(); };
         document.getElementById('toggle-settings-btn').onclick = () => document.getElementById('settings-panel').classList.toggle('hidden');
-        document.getElementById('save-keys-btn').onclick = () => { localStorage.setItem('cs_aion_gemini_key', document.getElementById('gemini-key-input').value); localStorage.setItem('cs_aion_lilla_key', document.getElementById('lilla-key-input').value); alert("Mentve!"); };
+        document.getElementById('save-keys-btn').onclick = () => { localStorage.setItem('cs_aion_gemini_key', document.getElementById('gemini-key-input').value); localStorage.setItem('cs_aion_lilla_key', document.getElementById('lilla-key-input').value); alert("Kulcsok mentve!"); };
         render();
     </script>
 </body>
