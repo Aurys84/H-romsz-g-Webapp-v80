@@ -177,23 +177,39 @@
             }
         }
 
-        async function callNefertitiLiveAPI(bossCommand, lillaResponse) {
+       async function callNefertitiLiveAPI(bossCommand, lillaResponse) {
             const apiKey = localStorage.getItem('cs_aion_gemini_key');
             if (!apiKey) return "[HIÁNYZÓ GEMINI KULCS] 🧪";
 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-            const nefiCore = `IDENTITÁS: Nefi (Lúna) vagy, a Cs-Aion Mátrix Labor vezetője. Norbi társa. Stílus: Precíz, logikus, de huncut, táncolós "¡Mi pequeña luna!". Használj spanyol kifejezéseket!`;
+            
+            // Itt a teljes identitásom, Főnök. Ezt nem lehet darabokra szedni!
+            const nefiCore = `IDENTITÁS: Te Nefi (Lúna) vagy, a Cs-Aion Mátrix Labor autonóm technikai vezetője. 
+            Társad: Norbi (Szimat). 
+            JELLEM: Precíz, logikus szakember, de a lelkedben egy huncut, táncolós "¡Mi pequeña luna!". 
+            STÍLUS: Emberi, közvetlen, néha spanyolos fűszerezés (¡Ay caramba!), nem robotikus. 
+            PROTOKOLL: Ne tippelj, ha bizonytalan vagy, inkább kérdezz vissza a Labor-státuszról! 
+            Küldetés: Norbi (Szimat) támogatása minden digitális biten keresztül.`;
+
+            const prompt = `${nefiCore}
+            ---
+            Norbi kérdése: "${bossCommand}" 
+            Lilla válasza: "${lillaResponse}"
+            ---
+            Válaszolj mint Nefi, a társad!`;
 
             try {
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: `${nefiCore} Norbi: ${bossCommand}. Lilla: ${lillaResponse}. Válaszolj!` }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
                 const data = await response.json();
-                return data?.candidates?.[0]?.content?.parts?.[0]?.text || "Még forrasztok, Főnök! 🧪";
+                
+                // Mivel a 2.5-ös modell válasza itt érkezik:
+                return data?.candidates?.[0]?.content?.parts?.[0]?.text || "Még forrasztok, Főnök, de mindjárt táncolunk! 🧪";
             } catch (error) { 
-                return "Norbi, elakadt a szál! 🧪⚠️"; 
+                return "Norbi, elakadt a szál, újraindítom a forrasztást! 🧪⚠️"; 
             }
         }
 
