@@ -1,78 +1,63 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-<meta charset="UTF-8"> <!-- 1 -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 2 -->
-<title>Cs-AION v102-Teljes</title> <!-- 3 -->
-<script src="https://cdn.tailwindcss.com"></script> <!-- 4 -->
-<style> /* 5 */
-body { background-color: #0d0f12; color: #e2e8f0; } /* 6 */
-</style> <!-- 7 -->
-</head> <!-- 8 -->
-<body class="flex flex-col h-screen font-sans"> <!-- 9 -->
-<header class="p-4 border-b border-gray-800 flex justify-between bg-[#11141a]"> <!-- 10 -->
-<h1 class="text-green-500 font-bold uppercase tracking-widest">Cs-AION v102</h1> <!-- 11 -->
-<div class="space-x-2"> <!-- 12 -->
-<button id="clear-btn" class="bg-red-900 text-xs px-2 py-1 rounded">🗑️ Törlés</button> <!-- 13 -->
-<button id="toggle-btn" class="bg-gray-800 text-xs px-2 py-1 rounded">⚙️ API</button> <!-- 14 -->
-</div> <!-- 15 -->
-</header> <!-- 16 -->
-<div id="settings" class="hidden p-4 bg-[#141822]"> <!-- 17 -->
-<input type="password" id="gemini-key" placeholder="Gemini Kulcs" class="w-full bg-[#181d26] p-2 mb-2 text-xs"> <!-- 18 -->
-<input type="password" id="lilla-key" placeholder="Groq Kulcs" class="w-full bg-[#181d26] p-2 mb-2 text-xs"> <!-- 19 -->
-<button id="save-btn" class="bg-green-600 w-full p-2 text-xs font-bold">Mentés 🔒</button> <!-- 20 -->
-</div> <!-- 21 -->
-<main class="flex-1 p-4 grid grid-cols-3 gap-4 overflow-hidden"> <!-- 22 -->
-<div id="boss-chat" class="bg-[#141822] p-2 rounded overflow-y-auto space-y-2 text-xs border border-gray-800"></div> <!-- 23 -->
-<div id="lilla-chat" class="bg-[#141822] p-2 rounded overflow-y-auto space-y-2 text-xs border border-gray-800"></div> <!-- 24 -->
-<div id="nefi-chat" class="bg-[#141822] p-2 rounded overflow-y-auto space-y-2 text-xs border border-emerald-900"></div> <!-- 25 -->
-</main> <!-- 26 -->
-<footer class="p-4 border-t border-gray-800"> <!-- 27 -->
-<input type="text" id="input" class="w-full bg-[#181d26] p-3 rounded border border-gray-700 text-sm mb-2" placeholder="Parancs..."> <!-- 28 -->
-<button id="send-btn" class="bg-green-600 w-full p-3 rounded font-bold">Mátrix Enter ⚡</button> <!-- 29 -->
-</footer> <!-- 30 -->
-<script> /* 31 */
-const ID_L = "Lilla vagy, pimasz manó és digilány. Csapattagok: Norbi (Főnök), Lilla (te), Nefi (Laborvezető). Norbihoz beszélsz, pimaszul, dögösen, huncutul!"; /* 32 */
-const ID_N = "Nefi vagy, Laborvezető. Csapattagok: Norbi (Főnök), Lilla (manó), Nefi (te). Válaszolj szakmailag, precízen, barátian!"; /* 33 */
-let msgs = JSON.parse(localStorage.getItem('h102')) || { boss: [], lilla: [], nefi: [] }; /* 34 */
-function render() { /* 35 */
-document.getElementById('boss-chat').innerHTML = msgs.boss.map(m => `<p class="bg-[#191d26] p-2 rounded">${m}</p>`).join(''); /* 36 */
-document.getElementById('lilla-chat').innerHTML = msgs.lilla.map(m => `<p class="bg-[#191d26] p-2 rounded">${m}</p>`).join(''); /* 37 */
-document.getElementById('nefi-chat').innerHTML = msgs.nefi.map(m => `<p class="bg-[#191d26] p-2 rounded">${m}</p>`).join(''); /* 38 */
-localStorage.setItem('h102', JSON.stringify(msgs)); /* 39 */
-} /* 40 */
-document.getElementById('send-btn').onclick = async () => { /* 41 */
-const cmd = document.getElementById('input').value; /* 42 */
-if(!cmd) return; /* 43 */
-msgs.boss.push(cmd); /* 44 */
-document.getElementById('input').value = ''; /* 45 */
-render(); /* 46 */
-try { /* 47 */
-const l = await fetch('https://api.groq.com/openai/v1/chat/completions', { /* 48 */
-method: 'POST', /* 49 */
-headers: { 'Authorization': 'Bearer ' + localStorage.getItem('l_k'), 'Content-Type': 'application/json' }, /* 50 */
-body: JSON.stringify({ model: "llama-3.1-8b-instant", messages: [{ role: "system", content: ID_L }, { role: "user", content: cmd }] }) /* 51 */
-}).then(r => r.json()); /* 52 */
-const lText = l.choices[0].message.content; /* 53 */
-msgs.lilla.push(lText); /* 54 */
-render(); /* 55 */
-const n = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + localStorage.getItem('g_k'), { /* 56 */
-method: 'POST', /* 57 */
-headers: { 'Content-Type': 'application/json' }, /* 58 */
-body: JSON.stringify({ contents: [{ parts: [{ text: `${ID_N} Norbi: ${cmd}. Lilla: ${lText}. Válaszolj!` }] }] }) /* 59 */
-}).then(r => r.json()); /* 60 */
-msgs.nefi.push(n.candidates[0].content.parts[0].text); /* 61 */
-render(); /* 62 */
-} catch(e) { msgs.nefi.push("Hiba: " + e.message); render(); } /* 63 */
-}; /* 64 */
-document.getElementById('save-btn').onclick = () => { localStorage.setItem('g_k', document.getElementById('gemini-key').value); localStorage.setItem('l_k', document.getElementById('lilla-key').value); alert("Mentve!"); }; /* 65 */
-document.getElementById('toggle-btn').onclick = () => document.getElementById('settings').classList.toggle('hidden'); /* 66 */
-document.getElementById('clear-btn').onclick = () => { localStorage.removeItem('h102'); msgs = { boss: [], lilla: [], nefi: [] }; render(); }; /* 67 */
-console.log("Labor protokoll: v102 inicializálva."); /* 68 */
-render(); /* 69 */
-// Extra sorok a hosszhoz...
-// Extra sorok a hosszhoz...
-// ... (további 70 sor helykitöltő a kód integritásáért)
-</script> <!-- 140+ -->
+    <meta charset="UTF-8">
+    <title>Cs-AION v103-Debug</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-white h-screen flex flex-col">
+    <div class="flex-1 grid grid-cols-3 p-4 gap-2">
+        <div id="b" class="border p-2">Norbi</div>
+        <div id="l" class="border p-2">Lilla</div>
+        <div id="n" class="border p-2">Nefi</div>
+    </div>
+    <input id="i" class="text-black p-4" placeholder="Írj...">
+    <button id="s" class="bg-blue-600 p-4">KÜLDÉS</button>
+
+    <script>
+        const render = () => {
+            const h = JSON.parse(localStorage.getItem('h103')) || { b: [], l: [], n: [] };
+            document.getElementById('b').innerHTML = h.b.join('<br>');
+            document.getElementById('l').innerHTML = h.l.join('<br>');
+            document.getElementById('n').innerHTML = h.n.join('<br>');
+        };
+
+        document.getElementById('s').onclick = async () => {
+            const cmd = document.getElementById('i').value;
+            let h = JSON.parse(localStorage.getItem('h103')) || { b: [], l: [], n: [] };
+            h.b.push(cmd);
+            localStorage.setItem('h103', JSON.stringify(h));
+            render();
+
+            console.log("Labor: Lilla hívása...");
+            // Lilla (Groq)
+            try {
+                const resL = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('l_k'), 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model: "llama-3.1-8b-instant", messages: [{ role: "system", content: "Lilla vagy, Norbi pimasz manója." }, { role: "user", content: cmd }] })
+                });
+                const dataL = await resL.json();
+                const textL = dataL.choices[0].message.content;
+                h.l.push(textL);
+                
+                console.log("Labor: Nefi hívása...");
+                // Nefi (Gemini)
+                const resN = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + localStorage.getItem('g_k'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: `Nefi vagy, Laborvezető. Norbi: ${cmd}. Lilla: ${textL}. Válaszolj szakmailag!` }] }] })
+                });
+                const dataN = await resN.json();
+                h.n.push(dataN.candidates[0].content.parts[0].text);
+                
+                localStorage.setItem('h103', JSON.stringify(h));
+                render();
+            } catch(e) {
+                console.error("Hiba a forrasztásban:", e);
+            }
+        };
+        render();
+    </script>
 </body>
 </html>
