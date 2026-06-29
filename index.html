@@ -187,16 +187,12 @@
             }
         }
 
-   async function callNefertitiLiveAPI(bossCommand, lillaResponse) {
+ async function callNefertitiLiveAPI(bossCommand, lillaResponse) {
             const apiKey = localStorage.getItem('cs_aion_gemini_key');
-            if (!apiKey) return "[HIÁNYZÓ GEMINI KULCS] Forrasztáshoz kell a Gemini kulcs! 🧪";
+            if (!apiKey) return "[HIÁNYZÓ GEMINI KULCS] 🧪";
 
-            // Visszaállítva a 2.5-ös verzióra, ami neked működött
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-            const prompt = `Identitásod: Nefertiti (Nefi), a Cs-AION Mátrix Labor technikai vezetője. Norbi partnere. 
-            Főnök parancsa: "${bossCommand}"
-            Lillacska válasza: "${lillaResponse}"
-            Válasz:`;
+            const prompt = `Identitásod: Nefertiti (Nefi), a Cs-AION Mátrix Labor technikai vezetője. Válaszolj szakmailag, precízen, barátian: ${bossCommand} (Lilla mondta: ${lillaResponse})`;
 
             try {
                 const response = await fetch(url, {
@@ -206,16 +202,18 @@
                 });
                 const data = await response.json();
                 
-                // Mivel a 2.5-ös modell válasza pontosan ezt a struktúrát igényli:
-                if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
-                    return data.candidates[0].content.parts[0].text;
-                } else {
-                    // Ha még mindig ide fut be, írjuk ki a konzolra a pontos okot
-                    console.error("Gemini 2.5 hiba:", data);
-                    return "Labor-üzenet: A szerver válaszolt, de a formátum eltér a vártól. (Lásd: F12 Konzol)";
-                }
+                // KONZOL-DEBUG: Ide írja ki pontosan, mit kapunk vissza a Google-től
+                console.log("Gemini Nyers Válasz:", data);
+
+                // UNIVERZÁLIS KERESŐ: Bármilyen Google választ megtalál
+                const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 
+                             data?.candidates?.[0]?.output || 
+                             data?.response?.text || 
+                             "Labor: A választ nem tudtam kibontani, de a szerver válaszolt.";
+                
+                return text;
             } catch (error) { 
-                return "Mátrix hálózati zaj (Nefi nem érhető el). 🧪⚠️"; 
+                return "Mátrix hálózati zaj. 🧪⚠️"; 
             }
         }
         async function triggerMatrixFlow() {
