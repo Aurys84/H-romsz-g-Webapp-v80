@@ -205,6 +205,10 @@
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
                 const data = await response.json();
+                // DEBUG: Ha nem jön szöveg, írjuk ki a konzolra, mi érkezett valójában!
+                if (!data?.candidates) {
+                    console.error("GOOGLE API HIBA (Nyers válasz):", data);
+                }
                 
                 // Mivel a 2.5-ös modell válasza itt érkezik:
                 return data?.candidates?.[0]?.content?.parts?.[0]?.text || "Még forrasztok, Főnök, de mindjárt táncolunk! 🧪";
