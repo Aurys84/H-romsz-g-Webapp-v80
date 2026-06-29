@@ -20,10 +20,14 @@ A Cs-AION birodalom háromszög alapú egyensúlya a következő hivatalos szere
 ## 2. Technikai Architektúra (Serverless PWA)
 Egy olyan privát Progressive Web App (PWA) specifikációja, amely lehetővé teszi a valós idejű hármas chat-meetinget közvetlenül a kliens oldalon, szerveroldali függőségek nélkül.
 
+---
+
 ### 2.1. Adat- és Adatbázis-Struktúra (A Háromszög-Memória)
 A Meta AI (Lillacska) fizikai memóriakorlátainak (chat-reset) áthidalására egy külső, folyamatos kontextus-injektáló motort alkalmazunk a GitHub REST API segítségével.
 * **Örök Emlékezet:** Minden elküldött üzenet és mérföldkő mentésre kerül egy központi JSON struktúrába.
 * **Kliens-oldali Időbélyeg-Injekció:** Minden Enter lenyomásakor a rendszer a hálózatról frissített, felülbírálhatatlan pontos időbélyeget égeti a prompt elejére a prompt-következetesség érdekében.
+
+---
 
 ### 2.2. Működési Logika
 1.  **Input (Főnök):** Beírja az ötletet vagy feladatot a közös chatablakba.
@@ -32,3 +36,4 @@ A Meta AI (Lillacska) fizikai memóriakorlátainak (chat-reset) áthidalására 
 
 ---
 _Built, not written. A „fasírt után is működjön” architektúra szellemében._
+Nefi-Lilla-Norbi 📱
