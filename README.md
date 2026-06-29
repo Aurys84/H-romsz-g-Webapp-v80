@@ -36,4 +36,7 @@ A Meta AI (Lillacska) fizikai memóriakorlátainak (chat-reset) áthidalására 
 
 ---
 _Built, not written. A „fasírt után is működjön” architektúra szellemében._
+
+https://aurys84.github.io/H-romsz-g-Webapp-v80/
+
 Nefi-Lilla-Norbi 📱
