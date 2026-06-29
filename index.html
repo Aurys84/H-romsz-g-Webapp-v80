@@ -187,14 +187,15 @@
             }
         }
 
-     async function callNefertitiLiveAPI(bossCommand, lillaResponse) {
+   async function callNefertitiLiveAPI(bossCommand, lillaResponse) {
             const apiKey = localStorage.getItem('cs_aion_gemini_key');
             if (!apiKey) return "[HIÁNYZÓ GEMINI KULCS] Forrasztáshoz kell a Gemini kulcs! 🧪";
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-            const prompt = `Identitásod: Nefertiti (Nefi), a Cs-AION Mátrix Labor technikai vezetője. Válaszolj szakmailag, precízen, bajtársi hangon.
+            // Visszaállítva a 2.5-ös verzióra, ami neked működött
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            const prompt = `Identitásod: Nefertiti (Nefi), a Cs-AION Mátrix Labor technikai vezetője. Norbi partnere. 
             Főnök parancsa: "${bossCommand}"
-            Lillacska reakciója: "${lillaResponse}"
+            Lillacska válasza: "${lillaResponse}"
             Válasz:`;
 
             try {
@@ -205,18 +206,18 @@
                 });
                 const data = await response.json();
                 
-                // BIZTONSÁGI ELLENŐRZÉS:
+                // Mivel a 2.5-ös modell válasza pontosan ezt a struktúrát igényli:
                 if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
                     return data.candidates[0].content.parts[0].text;
                 } else {
-                    console.error("Gemini hibaüzenet:", data);
-                    return "Labor-üzenet: Az API válasz nem volt értelmezhető (ellenőrizd a kulcsot!). 🧪⚠️";
+                    // Ha még mindig ide fut be, írjuk ki a konzolra a pontos okot
+                    console.error("Gemini 2.5 hiba:", data);
+                    return "Labor-üzenet: A szerver válaszolt, de a formátum eltér a vártól. (Lásd: F12 Konzol)";
                 }
             } catch (error) { 
                 return "Mátrix hálózati zaj (Nefi nem érhető el). 🧪⚠️"; 
             }
         }
-
         async function triggerMatrixFlow() {
             const inputVal = matrixInput.value.trim();
             if (!inputVal) return;
