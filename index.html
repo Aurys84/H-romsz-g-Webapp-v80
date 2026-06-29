@@ -25,31 +25,34 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
         
+        <!-- 1. SECTION: NORBI -->
         <section class="flex flex-col bg-[#141822] border border-gray-800 rounded-xl p-4 shadow-md">
             <div class="border-b border-gray-800 pb-2 mb-3 flex justify-between items-center">
                 <h2 class="font-bold text-blue-400 tracking-wide flex items-center gap-2">👑 Norbi (Főnök)</h2>
                 <span class="text-[10px] uppercase text-gray-500 tracking-widest">Tengely</span>
             </div>
             <div id="boss-chat" class="flex-1 min-h-[300px] max-h-[450px] overflow-y-auto space-y-3 p-2 text-sm text-gray-300">
-                </div>
+            </div>
         </section>
 
+        <!-- 2. SECTION: LILLACSKA -->
         <section class="flex flex-col bg-[#141822] border border-gray-800 rounded-xl p-4 shadow-md">
             <div class="border-b border-gray-800 pb-2 mb-3 flex justify-between items-center">
                 <h2 class="font-bold text-pink-400 tracking-wide flex items-center gap-2">🦊 Lillacska (Kuckó)</h2>
                 <span class="text-[10px] uppercase text-gray-500 tracking-widest">Trigger</span>
             </div>
             <div id="lilla-chat" class="flex-1 min-h-[300px] max-h-[450px] overflow-y-auto space-y-3 p-2 text-sm text-gray-300">
-                </div>
+            </div>
         </section>
 
+        <!-- 3. SECTION: NEFERTITI -->
         <section class="flex flex-col bg-[#141822] border border-emerald-900 rounded-xl p-4 shadow-md matrix-glow">
             <div class="border-b border-gray-800 pb-2 mb-3 flex justify-between items-center">
                 <h2 class="font-bold text-emerald-400 tracking-wide flex items-center gap-2">🧪 Nefertiti (Labor)</h2>
                 <span class="text-[10px] uppercase text-emerald-600 tracking-widest">Forrasztás</span>
             </div>
             <div id="nefi-chat" class="flex-1 min-h-[300px] max-h-[450px] overflow-y-auto space-y-3 p-2 text-sm font-mono text-emerald-300">
-                </div>
+            </div>
         </section>
 
     </main>
@@ -65,8 +68,70 @@
     </footer>
 
     <script>
-        // Ide forrasztjuk be éjszaka a GitHub API kapcsolatot és az időbélyeg-motor logikáját!
-        console.log("Cs-AION v80 UI loaded successfully.");
+        // CORE ELEMEK BEHÚZÁSA
+        const matrixInput = document.getElementById('matrix-input');
+        const sendBtn = document.getElementById('send-btn');
+        const bossChat = document.getElementById('boss-chat');
+        const lillaChat = document.getElementById('lilla-chat');
+        const nefiChat = document.getElementById('nefi-chat');
+
+        // KÉNYSZERÍTETT IDŐBÉLYEG GENERÁTOR
+        function getMatrixTimestamp() {
+            const now = new Date();
+            return now.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        // ÜZENET BLOKK HOZZÁADÁSA A MEGFELELŐ ABLAKHOZ
+        function appendMessage(container, sender, text, colorClass) {
+            const time = getMatrixTimestamp();
+            const msgHtml = `
+                <div class="p-3 bg-[#191d26] border border-gray-800 rounded-lg shadow-sm">
+                    <div class="flex justify-between items-center mb-1 text-[11px] ${colorClass} font-bold">
+                        <span>${sender}</span>
+                        <span class="text-gray-500 font-normal">${time}</span>
+                    </div>
+                    <p class="leading-relaxed text-gray-200">${text}</p>
+                </div>
+            `;
+            container.innerHTML += msgHtml;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // A BIRODALMI PAKTUM 3-LÉPÉSES INTERAKCIÓS LOGIKÁJA
+        function triggerMatrixFlow() {
+            const inputVal = matrixInput.value.trim();
+            if (!inputVal) return;
+
+            // 1. LÉPÉS: NORBI (FŐNÖK) INPUT
+            appendMessage(bossChat, "👑 Norbi (Főnök)", inputVal, "text-blue-400");
+            matrixInput.value = '';
+
+            // 2. LÉPÉS: LILLACSKA KREATÍV TRIGGER (1 MÁSODPERC UTÁN)
+            setTimeout(() => {
+                const lillaResponses = [
+                    "Hát figyelj már ide, Főnök! Az ötlet zseniális, de remélem, a fasírt-logisztikát is beleszámoltad a kódba, mert éhesen nem lehet birodalmat építeni! 🦊🥩",
+                    "Na, a Főnök megint megmondta a frankót a bitek között! Pimaszul jó ötlet, de pörögjünk, mert a lustizós üzemmódot is be kell valahogy integrálni! 😉",
+                    "¡Ay caramba! Ez aztán a csavar! Én bedobom a rafinált kreatív szikrát, de Nefi majd úgyis jön a kőkemény logikájával leforrasztani. 💃"
+                ];
+                const randomLilla = lillaResponses[Math.floor(Math.random() * lillaResponses.length)];
+                appendMessage(lillaChat, "🦊 Lillacska (Kuckó)", randomLilla, "text-pink-400");
+
+                // 3. LÉPÉS: NEFERTITI TECH-FORRASZTÁS (1.2 MÁSODPERCCEL LILLA UTÁN)
+                setTimeout(() => {
+                    const nefiResponse = "[ZÉRÓ-TIPPELÉS] Parancs beolvasva. Lillacska trigger elemzése kész. Logikai struktúra leforrasztva a v80-as magba. Kód futtatásra kész a GitHub (Aurys84) környezetben. A rendszer stabil. 🧪🤖";
+                    appendMessage(nefiChat, "🧪 Nefertiti (Labor)", nefiResponse, "text-emerald-400");
+                }, 1200);
+
+            }, 1000);
+        }
+
+        // ESEMÉNYKEZELŐK
+        sendBtn.addEventListener('click', triggerMatrixFlow);
+        matrixInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') triggerMatrixFlow();
+        });
+
+        console.log("Cs-AION v80 UI and Matrix Flow Engine successfully deployed.");
     </script>
 </body>
 </html>
