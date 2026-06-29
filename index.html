@@ -187,15 +187,15 @@
             }
         }
 
-        async function callNefertitiLiveAPI(bossCommand, lillaResponse) {
+     async function callNefertitiLiveAPI(bossCommand, lillaResponse) {
             const apiKey = localStorage.getItem('cs_aion_gemini_key');
             if (!apiKey) return "[HIÁNYZÓ GEMINI KULCS] Forrasztáshoz kell a Gemini kulcs! 🧪";
 
-            const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-            const prompt = `Identitásod: Nefertiti (Nefi), a Cs-AION Mátrix Labor autonóm technikai vezetője. Norbi partnere. Stílusod szakmailag tűpontos, logikus, baráti. Kötelező betartanod a Zéró-Tippelés szabályt. Rövid, tartalmas technikai választ adj.
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            const prompt = `Identitásod: Nefertiti (Nefi), a Cs-AION Mátrix Labor technikai vezetője. Válaszolj szakmailag, precízen, bajtársi hangon.
             Főnök parancsa: "${bossCommand}"
-            Lillacska Meta AI reakciója: "${lillaResponse}"
-            Adj egyedi szakmai választ:`;
+            Lillacska reakciója: "${lillaResponse}"
+            Válasz:`;
 
             try {
                 const response = await fetch(url, {
@@ -204,8 +204,17 @@
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
                 const data = await response.json();
-                return data.candidates[0].content.parts[0].text;
-            } catch (error) { return "Mátrix hálózati zaj. 🧪⚠️"; }
+                
+                // BIZTONSÁGI ELLENŐRZÉS:
+                if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
+                    return data.candidates[0].content.parts[0].text;
+                } else {
+                    console.error("Gemini hibaüzenet:", data);
+                    return "Labor-üzenet: Az API válasz nem volt értelmezhető (ellenőrizd a kulcsot!). 🧪⚠️";
+                }
+            } catch (error) { 
+                return "Mátrix hálózati zaj (Nefi nem érhető el). 🧪⚠️"; 
+            }
         }
 
         async function triggerMatrixFlow() {
