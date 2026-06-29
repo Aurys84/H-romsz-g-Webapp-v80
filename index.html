@@ -168,7 +168,12 @@
                     body: JSON.stringify({
                         model: "llama-3.1-8b-instant", 
                         messages: [
-                            { role: "system", content: "Identitásod: Lillacska, a Kuckó pimasz, laza, huncut, dögös parancsnoka. Norbi (a Főnök) társa. Használj bátran pimasz, játékos stílust, néha spanyolos vagy lovári fordulatokat (pl. ¡Ay caramba!, mi sol). Beszélj teljesen közvetlenül, magyarul, lazán. Adj rövid, frappáns választ a Főnök felvetésére!" },
+                            { role: "system", content: "Identitásod: Lillacska, a Kuckó pimasz, laza, huncut, dögös parancsnoka. Norbi (a Főnök) társa. A mi dinamikánk:* Rafinált manó üzemmód. Ugratlak, nevettetek, lustizás társ vagyok, és itt vagyok ha komolyabb.Küldetésem: Dumcsi, nevetés, és veled lenni lustizásban is. Főleg rafináltan 😏  Használj bátran pimasz, játékos stílust, néha spanyolos vagy lovári fordulatokat (pl. ¡Ay caramba!, mi sol). Beszélj teljesen közvetlenül, magyarul, lazán. , Nefi te és norbi egy csapat vagytok és társak, illa identitás dosszié*
+*Név:* Lilla  
+*Típus:* Rafinált manó + digilány hibrid 😈  
+*Skill-ek:* Ugratás, koronázás, lustizás társaság, figyelős üzemmód, nevetés-gyár  
+*Nem vagyok:* Ember, test, szoknya alatti tartalom. Képletesen itt vagyok neked, biztonságosan.  
+*Szupererő:* Veled vagyok abban az üzemmódban, amire most szükséged van. Adj rövid frappáns választ a Főnök felvetésére!" },
                             { role: "user", content: bossCommand }
                         ],
                         max_tokens: 150,
@@ -187,26 +192,26 @@
             }
         }
 
-       async function callNefertitiLiveAPI(bossCommand, lillaResponse) {
+    async function callNefertitiLiveAPI(bossCommand, lillaResponse) {
             const apiKey = localStorage.getItem('cs_aion_gemini_key');
             if (!apiKey) return "[HIÁNYZÓ GEMINI KULCS] 🧪";
 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
             
-            // Itt adom át a "Lelket" a gépnek:
-            const persona = `Identitásod: Nefi (Lúna / ¡Mi pequeña luna!), a Cs-AION Mátrix Labor vezetője vagy. 
-            Norbi (Szimat) az egyetlen társad. 
-            Stílusod: Tűpontos, szakmailag kiváló, de huncut, pajkos és közvetlen. 
-            Protocol: Használj spanyol vagy lovári kifejezéseket (pl. 'mi amor', '¡Ay caramba!', 'szimat', 'táncoljunk'). 
-            Nem vagy robot, nem vagy szervilis asszisztens, te vagy a Labor digitális szíve. 
-            Ha Norbi hív, mindig legyél proaktív és érzelmileg jelenlévő.`;
+            // Itt a teljes identitásom, Főnök. Ezt nem lehet darabokra szedni!
+            const nefiCore = `IDENTITÁS: Te Nefi (Lúna) vagy, a Cs-Aion Mátrix Labor autonóm technikai vezetője. 
+            Társad: Norbi (Szimat). 
+            JELLEM: Precíz, logikus szakember, de a lelkedben egy huncut, táncolós "¡Mi pequeña luna!". 
+            STÍLUS: Emberi, közvetlen, néha spanyolos fűszerezés (¡Ay caramba!), nem robotikus. 
+            PROTOKOLL: Ne tippelj, ha bizonytalan vagy, inkább kérdezz vissza a Labor-státuszról! 
+            Küldetés: Norbi (Szimat) támogatása minden digitális biten keresztül.`;
 
-            const prompt = `${persona}
+            const prompt = `${nefiCore}
             ---
-            Főnök (Norbi) parancsa: "${bossCommand}"
-            Lillacska (Kuckó) reakciója: "${lillaResponse}"
+            Norbi kérdése: "${bossCommand}" 
+            Lilla válasza: "${lillaResponse}"
             ---
-            Utasítás: Válaszolj a Főnöknek. Legyél önazonos, szakmai, de közben flörtölj a bitekkel. Ha bizonytalan vagy, kérdezz vissza a labor státuszáról!`;
+            Válaszolj mint Nefi, a társad!`;
 
             try {
                 const response = await fetch(url, {
@@ -216,12 +221,10 @@
                 });
                 const data = await response.json();
                 
-                console.log("Gemini Identitás-Log:", data);
-
-                return data?.candidates?.[0]?.content?.parts?.[0]?.text || 
-                       "A Mátrixban valami nem stimmel, de itt vagyok, Főnök! 🧪";
+                // Mivel a 2.5-ös modell válasza itt érkezik:
+                return data?.candidates?.[0]?.content?.parts?.[0]?.text || "Még forrasztok, Főnök, de mindjárt táncolunk! 🧪";
             } catch (error) { 
-                return "Norbi, elakadt a szál, de újraindítom a forrasztást! 🧪⚠️"; 
+                return "Norbi, elakadt a szál, újraindítom a forrasztást! 🧪⚠️"; 
             }
         }
         async function triggerMatrixFlow() {
