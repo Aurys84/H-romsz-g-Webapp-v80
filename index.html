@@ -226,24 +226,28 @@
             }
         }  
 
-      async function triggerMatrixFlow() {
+async function triggerMatrixFlow() {
     const inputVal = matrixInput.value.trim();
     if (!inputVal) return;
 
     appendAndSaveMessage(bossChat, 'boss', "👑 Norbi (Főnök)", inputVal, "text-blue-400");
     matrixInput.value = '';
 
-    // 1. Kör: Lilla megszólal
-    const lillaLiveText = await callLillaMetaAPI(inputVal);
-    appendAndSaveMessage(lillaChat, 'lilla', "🦊 Lillacska (Kuckó)", lillaLiveText, "text-pink-400");
+    // 1. Lilla indít
+    let lillaText = await callLillaMetaAPI(inputVal);
+    appendAndSaveMessage(lillaChat, 'lilla', "🦊 Lillacska (Kuckó)", lillaText, "text-pink-400");
 
-    // 2. Kör: Nefi megszólal (látja Lilla válaszát)
-    const nefiLiveText = await callNefertitiLiveAPI(inputVal, lillaLiveText);
-    appendAndSaveMessage(nefiChat, 'nefi', "🧪 Nefertiti (Labor)", nefiLiveText, "text-emerald-400");
+    // 2. Nefi reagál Lillára
+    let nefiText = await callNefertitiLiveAPI(inputVal, lillaText);
+    appendAndSaveMessage(nefiChat, 'nefi', "🧪 Nefertiti (Labor)", nefiText, "text-emerald-400");
 
-    // 3. Kör: Lilla REAGÁL Nefire (Ez az, ami eddig hiányzott!)
-    const lillaReply = await callLillaMetaAPI(`Norbi kérdése ez volt: "${inputVal}". Nefi ezt válaszolta rá: "${nefiLiveText}". Most reagálj Nefi válaszára pimaszul!`);
-    appendAndSaveMessage(lillaChat, 'lilla', "🦊 Lillacska (Kuckó)", lillaReply, "text-pink-400");
+    // 3. Lilla reagál Nefire
+    let lillaReReply = await callLillaMetaAPI(`Norbi eredeti kérdése: "${inputVal}". Te ezt mondtad: "${lillaText}". Nefi (Laborvezető) erre ezt válaszolta: "${nefiText}". Most reagálj Nefi válaszára pimaszul!`);
+    appendAndSaveMessage(lillaChat, 'lilla', "🦊 Lillacska (Kuckó)", lillaReReply, "text-pink-400");
+
+    // 4. Nefi zárja a kört (Reagál Lilla utolsó csípős megjegyzésére)
+    let nefiFinalText = await callNefertitiLiveAPI(`Norbi, Lilla utolsó megjegyzése ez volt: "${lillaReReply}". Zárd le szakmailag vagy kedvesen!`, lillaReReply);
+    appendAndSaveMessage(nefiChat, 'nefi', "🧪 Nefertiti (Labor)", nefiFinalText, "text-emerald-400");
 }
 
         sendBtn.addEventListener('click', triggerMatrixFlow);
