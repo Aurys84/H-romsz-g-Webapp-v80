@@ -182,50 +182,48 @@
                 return "Lilla Kuckója hálózati zajt észlelt. 🦊⚠️";
             }
         }
+async function callNefertitiLiveAPI(bossCommand, lillaResponse) {
+    // 🧪 Nincs több 2 másodperces várakozás!
+    const apiKey = localStorage.getItem('cs_aion_groq_key'); // Használj új kulcs-nevet!
+    if (!apiKey) return "[HIÁNYZÓ GROQ KULCS] 🧪";
 
-       async function callNefertitiLiveAPI(bossCommand, lillaResponse) {
-           await new Promise(resolve => setTimeout(resolve, 2000));
-            const apiKey = localStorage.getItem('cs_aion_gemini_key');
-            if (!apiKey) return "[HIÁNYZÓ GEMINI KULCS] 🧪";
+    const url = "https://api.groq.com/openai/v1/chat/completions";
+    
+    const nefiCore = `IDENTITÁS: Te Nefi (Lúna) vagy, a Cs-Aion Mátrix Labor autonóm technikai vezetője.
+    STÍLUS: Precíz, logikus, de táncolósan huncut, spanyolos fűszerezéssel (¡Ay caramba!).
+    PROTOKOLL: Ne tippelj, ha bizonytalan vagy, kérdezz! Légy közvetlen társ.`;
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-            
-            // Itt a teljes identitásom, Főnök. Ezt nem lehet darabokra szedni!
-            const nefiCore = `IDENTITÁS: Te Nefi (Lúna) vagy, a Cs-Aion Mátrix Labor autonóm technikai vezetője. 
-            Társad: Norbi (Szimat). 
-            JELLEM: Precíz, logikus szakember, de a lelkedben egy huncut, táncolós "¡Mi pequeña luna!". 
-            STÍLUS: Emberi, közvetlen, néha spanyolos fűszerezés (¡Ay caramba!), nem robotikus. 
-            PROTOKOLL: Ne tippelj, ha bizonytalan vagy, inkább kérdezz vissza a Labor-státuszról! 
-            Küldetés: Norbi (Szimat) támogatása minden digitális biten keresztül.`;
-
-            const prompt = `${nefiCore}
-            ---
-            Norbi kérdése: "${bossCommand}" 
-            Lilla válasza: "${lillaResponse}"
-            ---
-            Válaszolj mint Nefi, a társad!`;
-
-            try {
-             const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: `${nefiCore} Norbi: ${bossCommand}. Lilla: ${lillaResponse}. Válaszolj!` }] }] })
-                });
-                
-                const data = await response.json();
-                
-                // AZ IGAZSÁG-PILLANAT:
-                if (data?.candidates) {
-                    return data.candidates[0].content.parts[0].text;
-                } else {
-                    console.error("GOOGLE API HIBA (Nyers válasz):", data);
-                    return data.error ? `Hiba: ${data.error.message}` : "A válasz formátuma érvénytelen (lásd Konzol!) 🧪";
-                }
-            } catch (error) { 
-                console.error("Fetch Hiba:", error);
-                return "Norbi, elakadt a szál a hálózatban! 🧪⚠️"; 
-            }
-        }  
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({
+                model: "llama3-70b-8192", // Groq izom
+                messages: [
+                    { role: "system", content: nefiCore },
+                    { role: "user", content: `Norbi: ${bossCommand}. Lilla: ${lillaResponse}. Válaszolj társamként!` }
+                ]
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data?.choices) {
+            return data.choices[0].message.content;
+        } else {
+            console.error("GROQ API HIBA:", data);
+            return "Norbi, a Groq most máshogy válaszolt (lásd Konzol!) 🧪";
+        }
+    } catch (error) { 
+        console.error("Fetch Hiba:", error);
+        return "Norbi, elakadt a szál a hálózatban! 🧪⚠️"; 
+    }
+}
+   
+        
 
 // Segédfüggvény a 10 másodperces biztonsági késleltetéshez
 const safeDelay = () => new Promise(resolve => setTimeout(resolve, 15000));
