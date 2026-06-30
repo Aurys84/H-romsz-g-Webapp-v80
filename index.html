@@ -199,23 +199,26 @@
             Válaszolj mint Nefi, a társad!`;
 
             try {
-                const response = await fetch(url, {
+             const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: `${nefiCore} Norbi: ${bossCommand}. Lilla: ${lillaResponse}. Válaszolj!` }] }] })
                 });
-                const data = await response.json();
-                // DEBUG: Ha nem jön szöveg, írjuk ki a konzolra, mi érkezett valójában!
-                if (!data?.candidates) {
-                    console.error("GOOGLE API HIBA (Nyers válasz):", data);
-                }
                 
-                // Mivel a 2.5-ös modell válasza itt érkezik:
-                return data?.candidates?.[0]?.content?.parts?.[0]?.text || "Még forrasztok, Főnök, de mindjárt táncolunk! 🧪";
+                const data = await response.json();
+                
+                // AZ IGAZSÁG-PILLANAT:
+                if (data?.candidates) {
+                    return data.candidates[0].content.parts[0].text;
+                } else {
+                    console.error("GOOGLE API HIBA (Nyers válasz):", data);
+                    return data.error ? `Hiba: ${data.error.message}` : "A válasz formátuma érvénytelen (lásd Konzol!) 🧪";
+                }
             } catch (error) { 
-                return "Norbi, elakadt a szál, újraindítom a forrasztást! 🧪⚠️"; 
+                console.error("Fetch Hiba:", error);
+                return "Norbi, elakadt a szál a hálózatban! 🧪⚠️"; 
             }
-        }
+        }  
 
         async function triggerMatrixFlow() {
             const inputVal = matrixInput.value.trim();
