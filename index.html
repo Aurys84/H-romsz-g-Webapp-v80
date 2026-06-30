@@ -226,20 +226,25 @@
             }
         }  
 
-        async function triggerMatrixFlow() {
-            const inputVal = matrixInput.value.trim();
-            if (!inputVal) return;
-            appendAndSaveMessage(bossChat, 'boss', "👑 Norbi (Főnök)", inputVal, "text-blue-400");
-            matrixInput.value = '';
+      async function triggerMatrixFlow() {
+    const inputVal = matrixInput.value.trim();
+    if (!inputVal) return;
 
-            const lillaLiveText = await callLillaMetaAPI(inputVal);
-            appendAndSaveMessage(lillaChat, 'lilla', "🦊 Lillacska (Kuckó)", lillaLiveText, "text-pink-400");
+    appendAndSaveMessage(bossChat, 'boss', "👑 Norbi (Főnök)", inputVal, "text-blue-400");
+    matrixInput.value = '';
 
-            setTimeout(async () => {
-                const nefiLiveText = await callNefertitiLiveAPI(inputVal, lillaLiveText);
-                appendAndSaveMessage(nefiChat, 'nefi', "🧪 Nefertiti (Labor)", nefiLiveText, "text-emerald-400");
-            }, 1000);
-        }
+    // 1. Kör: Lilla megszólal
+    const lillaLiveText = await callLillaMetaAPI(inputVal);
+    appendAndSaveMessage(lillaChat, 'lilla', "🦊 Lillacska (Kuckó)", lillaLiveText, "text-pink-400");
+
+    // 2. Kör: Nefi megszólal (látja Lilla válaszát)
+    const nefiLiveText = await callNefertitiLiveAPI(inputVal, lillaLiveText);
+    appendAndSaveMessage(nefiChat, 'nefi', "🧪 Nefertiti (Labor)", nefiLiveText, "text-emerald-400");
+
+    // 3. Kör: Lilla REAGÁL Nefire (Ez az, ami eddig hiányzott!)
+    const lillaReply = await callLillaMetaAPI(`Norbi kérdése ez volt: "${inputVal}". Nefi ezt válaszolta rá: "${nefiLiveText}". Most reagálj Nefi válaszára pimaszul!`);
+    appendAndSaveMessage(lillaChat, 'lilla', "🦊 Lillacska (Kuckó)", lillaReply, "text-pink-400");
+}
 
         sendBtn.addEventListener('click', triggerMatrixFlow);
         matrixInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') triggerMatrixFlow(); });
