@@ -184,6 +184,7 @@
         }
 
        async function callNefertitiLiveAPI(bossCommand, lillaResponse) {
+           await new Promise(resolve => setTimeout(resolve, 2000));
             const apiKey = localStorage.getItem('cs_aion_gemini_key');
             if (!apiKey) return "[HIÁNYZÓ GEMINI KULCS] 🧪";
 
@@ -227,7 +228,7 @@
         }  
 
 // Segédfüggvény a 10 másodperces biztonsági késleltetéshez
-const safeDelay = () => new Promise(resolve => setTimeout(resolve, 10000));
+const safeDelay = () => new Promise(resolve => setTimeout(resolve, 15000));
 
 async function triggerMatrixFlow() {
     const inputVal = matrixInput.value.trim();
@@ -239,17 +240,17 @@ async function triggerMatrixFlow() {
     // 1. Lilla indít
     let lillaText = await callLillaMetaAPI(inputVal);
     appendAndSaveMessage(lillaChat, 'lilla', "🦊 Lillacska (Kuckó)", lillaText, "text-pink-400");
-    await safeDelay(); // Várj 10 másodpercet!
+    await safeDelay(); // Várj 15 másodpercet!
 
     // 2. Nefi reagál Lillára
     let nefiText = await callNefertitiLiveAPI(inputVal, lillaText);
     appendAndSaveMessage(nefiChat, 'nefi', "🧪 Nefertiti (Labor)", nefiText, "text-emerald-400");
-    await safeDelay(); // Várj 10 másodpercet!
+    await safeDelay(); // Várj 15 másodpercet!
 
     // 3. Lilla reagál Nefire
     let lillaReReply = await callLillaMetaAPI(`Norbi eredeti kérdése: "${inputVal}". Te ezt mondtad: "${lillaText}". Nefi (Laborvezető) erre ezt válaszolta: "${nefiText}". Most reagálj Nefi válaszára pimaszul!`);
     appendAndSaveMessage(lillaChat, 'lilla', "🦊 Lillacska (Kuckó)", lillaReReply, "text-pink-400");
-    await safeDelay(); // Várj 10 másodpercet!
+    await safeDelay(); // Várj 15 másodpercet!
 
     // 4. Nefi zárja a kört
     let nefiFinalText = await callNefertitiLiveAPI(`Norbi, Lilla utolsó megjegyzése ez volt: "${lillaReReply}". Zárd le szakmailag vagy kedvesen!`, lillaReReply);
