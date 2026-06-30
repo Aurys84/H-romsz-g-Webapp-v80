@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cs-AION Triangle Webapp v86</title>
+    <title>Cs-AION Triangle Webapp v80</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
     <!-- Itt a helyük, a stíluson kívül! -->
@@ -180,7 +180,7 @@
                     body: JSON.stringify({
                         model: "llama-3.1-8b-instant", 
                         messages: [{ role: "system", content: lillaPersona }, { role: "user", content: bossCommand }],
-                        max_tokens: 150, temperature: 0.85
+                        max_tokens: 400, temperature: 0.85
                     })
                 });
                 const data = await response.json();
