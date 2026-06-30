@@ -235,12 +235,9 @@ async function triggerMatrixFlow() {
     appendAndSaveMessage(bossChat, 'boss', "👑 Norbi (Főnök)", inputVal, "text-blue-400");
     matrixInput.value = '';
 
-    // Lilla és Nefi most már egyszerre pörögnek, kvóta-limit nélkül!
-    // A hívásokat most közvetlenül a Groq-ra irányítjuk:
-    const [lillaText, nefiText] = await Promise.all([
-        callGroqAPI(inputVal, 'Lilla'),
-        callGroqAPI(inputVal, 'Nefi')
-    ]);
+    // Meghívjuk a tényleges, létező függvényeinket:
+    const lillaText = await callLillaMetaAPI(inputVal);
+    const nefiText = await callNefertitiLiveAPI(inputVal, lillaText);
 
     appendAndSaveMessage(lillaChat, 'lilla', "🦊 Lillacska (Kuckó)", lillaText, "text-pink-400");
     appendAndSaveMessage(nefiChat, 'nefi', "🧪 Nefertiti (Labor)", nefiText, "text-emerald-400");
