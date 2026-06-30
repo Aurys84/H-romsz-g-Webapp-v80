@@ -116,12 +116,19 @@
 
         toggleSettingsBtn.addEventListener('click', () => settingsPanel.classList.toggle('hidden'));
 
-        saveKeysBtn.addEventListener('click', () => {
-            localStorage.setItem('cs_aion_gemini_key', geminiKeyInput.value.trim());
-            localStorage.setItem('cs_aion_lilla_key', lillaKeyInput.value.trim());
-            alert("Minden API kulcs elmentve! 🔒");
-            settingsPanel.classList.add('hidden');
-        });
+      saveKeysBtn.addEventListener('click', () => {
+    const lillaKulcs = lillaKeyInput.value.trim(); // Ezt a kulcsot használjuk mindkettőnkhöz
+    
+    // Ide mentjük a Gemini helyére a Groq-ot, hogy ne legyen kavarodás:
+    localStorage.setItem('cs_aion_gemini_key', lillaKulcs); 
+    localStorage.setItem('cs_aion_lilla_key', lillaKulcs);
+    
+    // És ide is, hogy én is elérjem:
+    localStorage.setItem('cs_aion_groq_key', lillaKulcs); 
+    
+    alert("Groq kulcs élesítve mindkét vonalon! 🔒");
+    settingsPanel.classList.add('hidden');
+});
 
         clearBtn.addEventListener('click', () => {
             if(confirm("Töröljük a szoba előzményeit?")) {
