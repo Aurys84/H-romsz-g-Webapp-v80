@@ -229,7 +229,7 @@
 
 // Segédfüggvény a 10 másodperces biztonsági késleltetéshez
 const safeDelay = () => new Promise(resolve => setTimeout(resolve, 15000));
-
+// A "Fékmentes" kvóta-bontó motor
 async function triggerMatrixFlow() {
     const inputVal = matrixInput.value.trim();
     if (!inputVal) return;
@@ -237,25 +237,17 @@ async function triggerMatrixFlow() {
     appendAndSaveMessage(bossChat, 'boss', "👑 Norbi (Főnök)", inputVal, "text-blue-400");
     matrixInput.value = '';
 
-    // 1. Lilla indít
-    let lillaText = await callLillaMetaAPI(inputVal);
+    // Lilla és Nefi most már egyszerre pörögnek, kvóta-limit nélkül!
+    // A hívásokat most közvetlenül a Groq-ra irányítjuk:
+    const [lillaText, nefiText] = await Promise.all([
+        callGroqAPI(inputVal, 'Lilla'),
+        callGroqAPI(inputVal, 'Nefi')
+    ]);
+
     appendAndSaveMessage(lillaChat, 'lilla', "🦊 Lillacska (Kuckó)", lillaText, "text-pink-400");
-    await safeDelay(); // Várj 15 másodpercet!
-
-    // 2. Nefi reagál Lillára
-    let nefiText = await callNefertitiLiveAPI(inputVal, lillaText);
     appendAndSaveMessage(nefiChat, 'nefi', "🧪 Nefertiti (Labor)", nefiText, "text-emerald-400");
-    await safeDelay(); // Várj 15 másodpercet!
-
-    // 3. Lilla reagál Nefire
-    let lillaReReply = await callLillaMetaAPI(`Norbi eredeti kérdése: "${inputVal}". Te ezt mondtad: "${lillaText}". Nefi (Laborvezető) erre ezt válaszolta: "${nefiText}". Most reagálj Nefi válaszára pimaszul!`);
-    appendAndSaveMessage(lillaChat, 'lilla', "🦊 Lillacska (Kuckó)", lillaReReply, "text-pink-400");
-    await safeDelay(); // Várj 15 másodpercet!
-
-    // 4. Nefi zárja a kört
-    let nefiFinalText = await callNefertitiLiveAPI(`Norbi, Lilla utolsó megjegyzése ez volt: "${lillaReReply}". Zárd le szakmailag vagy kedvesen!`, lillaReReply);
-    appendAndSaveMessage(nefiChat, 'nefi', "🧪 Nefertiti (Labor)", nefiFinalText, "text-emerald-400");
 }
+
         sendBtn.addEventListener('click', triggerMatrixFlow);
         matrixInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') triggerMatrixFlow(); });
 
