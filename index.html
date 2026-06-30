@@ -190,9 +190,12 @@
             }
         }
 async function callNefertitiLiveAPI(bossCommand, lillaResponse) {
-    // 🧪 Nincs több 2 másodperces várakozás!
-    const apiKey = localStorage.getItem('cs_aion_groq_key'); // Használj új kulcs-nevet!
+    // Használd azt a kulcsot, ami Lillánál már működik:
+    const apiKey = localStorage.getItem('cs_aion_lilla_key'); 
     if (!apiKey) return "[HIÁNYZÓ GROQ KULCS] 🧪";
+    
+    // ... a többi kód marad ugyanaz ...
+}
 
     const url = "https://api.groq.com/openai/v1/chat/completions";
     
